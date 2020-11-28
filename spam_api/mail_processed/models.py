@@ -8,7 +8,7 @@ class Emails(models.Model):
     content   = models.CharField(verbose_name="Contenido",max_length=1500)
     user      = models.ForeignKey(User, on_delete=models.CASCADE)
     created   = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de petición")
-    predicted = models.IntegerField(verbose_name="Predicción spam/ham")
+    predicted = models.IntegerField(verbose_name="Predicción spam/ham",null=True)
 
     class Meta:
         verbose_name = "email"

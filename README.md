@@ -9,6 +9,7 @@ pip install pipenv
 2. Luego para levantar el entorno virtual y que se instalen los paquetes configurados en el archivo Pipfile, parandonos en el directorio donde hayamos clonado el repositorio ejecutar:
 ```
 pipenv shell
+pipenv install
 ```
 
 ## Django:
