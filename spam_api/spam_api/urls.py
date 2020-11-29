@@ -17,49 +17,50 @@ Including another URLconf
 
 from django.urls import path, include
 from django.contrib.auth.models import User
-from rest_framework import routers, serializers, viewsets
 from rest_framework_jwt.views import obtain_jwt_token
 from django.contrib import admin
+from mail_processed import views as mail_processed_views
+from django.conf.urls import url
 
-# Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'is_staff']
+from rest_framework import routers
+from rest_fwork import views as fwork_views
 
-# ViewSets define the view behavior.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
-
 class test_if_logged(APIView):
-
     def get(self, request):
-          # en request.user tiene el objeto user de quien hizo el pedido
-        # print('HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        # print(request.user)
         return Response({'status':'ok!'})
 
-# Routers provide an easy way of automatically determining the URL conf.
+
+
+
+from rest_fwork.views import EmailsDetail, EmailsList, UserList, UserDetail
+from rest_framework import renderers
+
+
+# email_detail = EmailsPredictedViewSet.as_view({
+#     'get': 'retrieve',
+# })
+
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+# router.register(r'users', fwork_views.UserViewSet)
+# router.register(r'groups', fwork_views.GroupViewSet)
+# router.register(r'emails', fwork_views.EmailsList)
+# router.register(r'emails', email_list.viewset)
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
-
-from mail_processed import views as mail_processed_views
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api-token-auth/', obtain_jwt_token),
     path('test_if_logged',test_if_logged.as_view()),
-    path('prueba',mail_processed_views.probando_emails)
-    # url(r'^api-token-auth/', obtain_jwt_token),
+    path('prueba',mail_processed_views.probando_emails),
+    path('process_email/', EmailsList.as_view(), name='emails-list'),
+    path('process_email/<int:pk>/', EmailsDetail.as_view(), name='emails-detail'),
+    path('users/', UserList.as_view()),
+    path('users/<int:pk>/', UserDetail.as_view()),
 ]
 
