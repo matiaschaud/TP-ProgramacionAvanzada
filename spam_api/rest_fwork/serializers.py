@@ -21,8 +21,8 @@ class EmailPredictedSerializer(serializers.Serializer):
     subject = serializers.CharField(max_length=200)
     content = serializers.CharField(max_length=1500)
     user = serializers.ReadOnlyField(source='user.username')
-    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     predicted = serializers.IntegerField(read_only=True)
+    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     # created = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):

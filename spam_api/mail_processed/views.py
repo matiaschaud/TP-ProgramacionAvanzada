@@ -10,12 +10,8 @@ from django.http import HttpResponse
 
 def probando_emails(request):
     emails = Emails.objects.all()
-            
-    # for email in Emails.objects.get(user=request.user):
-    #     print(email.user.email)
-    print(Emails.objects.filter(user=request.user))
-    # if request.method == "POST":
-    #     data = request.GET
-    #     return HttpResponse(data)
+    print(request.user.token)
+
+
     return HttpResponse(emails)
     

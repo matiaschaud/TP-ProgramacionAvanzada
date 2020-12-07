@@ -36,8 +36,12 @@ class test_if_logged(APIView):
 
 
 
-from rest_fwork.views import EmailsDetail, EmailsList, UserList, UserDetail
+from rest_fwork.views import EmailsDetail, EmailsList, UserList, UserDetail, Login, Logout
 from rest_framework import renderers
+from rest_framework.authtoken import views as views_authtoken
+
+from rest_framework_jwt.views import verify_jwt_token
+from rest_framework_jwt.views import refresh_jwt_token
 
 
 # email_detail = EmailsPredictedViewSet.as_view({
@@ -52,15 +56,26 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    path('api-token-auth/', obtain_jwt_token),
-    path('test_if_logged',test_if_logged.as_view()),
     path('prueba',mail_processed_views.probando_emails),
+
+    # REST API
+    path('', include(router.urls)),
     path('process_email/', EmailsList.as_view(), name='emails-list'),
     path('process_email/<int:pk>/', EmailsDetail.as_view(), name='emails-detail'),
     path('users/', UserList.as_view()),
     path('users/<int:pk>/', UserDetail.as_view()),
+    path('test_if_logged',test_if_logged.as_view()),
+    # rest api token
+    path('api-generate-token/', views_authtoken.obtain_auth_token),
+    path('login/', Login.as_view(), name = 'login'),
+    path('logout/', Logout.as_view()),
+
+    # # TOKEN
+    # path('api-token-auth/', obtain_jwt_token),
+    # path('api-token-refresh/', refresh_jwt_token),
+    # path('api-token-verify/', verify_jwt_token),
+
+    
 ]
 
