@@ -16,17 +16,7 @@ from rest_framework import status
 
 # Para los permisos
 from rest_framework import permissions
-from .permissions import IsOwnerOrReadOnly
-
-
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from .permissions import IsOwnerOrReadOnly, IsDashboardUser
 
 
 # class EmailsPredictedViewSet(viewsets.ModelViewSet):
@@ -40,12 +30,32 @@ class EmailsListUser(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, pk, format=None):
-        print('estoy aca')
-        if request.user == 'AnonymousUser':
-            return Response(status = status.HTTP_401_UNAUTHORIZED)
 
         emails = Emails.objects.filter(user=request.user)
         serializer = EmailPredictedSerializer(emails[len(emails)-pk:], many=True)
+        return Response(serializer.data)
+
+class EmailsDashboard(APIView):
+    # permission_classes = (IsDashboardUser,)
+
+    def get(self, request, format=None):
+        if request.user.username != 'DashboardUser':
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        emails = Emails.objects.all()
+        serializer = EmailPredictedSerializer(emails, many=True)
+        return Response(serializer.data)
+
+
+class UsersDashboard(APIView):
+    # permission_classes = (IsDashboardUser,)
+
+    def get(self, request, format=None):
+        if request.user.username != 'DashboardUser':
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
 class EmailsList(
@@ -54,16 +64,15 @@ class EmailsList(
                   generics.GenericAPIView):
     queryset = Emails.objects.all()
     serializer_class = EmailPredictedSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                            IsOwnerOrReadOnly]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         # comprueba que el usuario este logeado
-        if request.user == 'AnonymousUser':
-            return Response(status = status.HTTP_401_UNAUTHORIZED)
+        # if request.user == 'AnonymousUser':
+        #     return Response(status = status.HTTP_401_UNAUTHORIZED)
 
         # comprueba si tiene cuota disponible, sino responde un fail
         quota_info_data = quota_info(request)
@@ -91,8 +100,7 @@ class EmailsDetail(APIView):
     """
     Retrieve, update or delete a emails instance.
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                            IsOwnerOrReadOnly]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self, pk):
         try:
@@ -124,13 +132,12 @@ class EmailsDetail(APIView):
 #     return HttpResponse("{" + f"'procesados': {emails}, 'disponible ':{cuota - emails}" + "}")
 
 class QuotaInfo(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                            IsOwnerOrReadOnly]
+    permission_classes = (permissions.IsAuthenticated,)
     
     def get(self, request, format=None):
         # El usuario está logeado?
-        if request.user == 'AnonymousUser':
-            return Response(status = status.HTTP_401_UNAUTHORIZED)
+        # if request.user == 'AnonymousUser':
+        #     return Response(status = status.HTTP_401_UNAUTHORIZED)
         
         
         try:

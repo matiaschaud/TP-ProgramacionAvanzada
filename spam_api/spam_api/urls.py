@@ -36,7 +36,7 @@ class test_if_logged(APIView):
 
 
 
-from rest_fwork.views import EmailsDetail, EmailsList, UserList, UserDetail, QuotaInfo, EmailsListUser
+from rest_fwork.views import EmailsDetail, EmailsList, QuotaInfo, EmailsListUser, EmailsDashboard, UsersDashboard
 from rest_framework import renderers
 
 
@@ -60,9 +60,9 @@ urlpatterns = [
     path('prueba',mail_processed_views.probando_emails),
     path('quota_info/',QuotaInfo.as_view()),
     path('process_email/', EmailsList.as_view(), name='emails-list'),
+    path('emails_dashboard/',EmailsDashboard.as_view()),
+    path('users_dashboard/',UsersDashboard.as_view()),
     path('history/<int:pk>/', EmailsListUser.as_view(), name='emails-list-user'),
     path('process_email/<int:pk>/', EmailsDetail.as_view(), name='emails-detail'),
-    path('users/', UserList.as_view()),
-    path('users/<int:pk>/', UserDetail.as_view()),
 ]
 
