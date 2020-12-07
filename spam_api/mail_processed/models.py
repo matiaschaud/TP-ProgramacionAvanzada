@@ -20,11 +20,21 @@ class Emails(models.Model):
         return self.subject
 
 
+class UserExtends(models.Model):
+	usuario = models.OneToOneField(User, on_delete=models.CASCADE,related_name='cuota')
+	cuota = models.IntegerField(default=20)
+
+    # class Meta:
+    #     verbose_name = "cuota"
+    #     verbose_name_plural = "cuotas"
+
+    # def __str__(self):
+    #     return self.usuario
+
 # podemos hacer esto para guardar info extra calculada de los campos del mail. Es como un trigger.
-""" @receiver(post_save, sender=Emails)
+@receiver(post_save, sender=User)
 def predice_spam(sender, instance, **kwargs):
-    email = Emails.objects.get(pk=instance.id)
-    if email.predicted is None:
-        email.predicted = 10
-        email.save()
- """
+    # para asegurarnos que se ejecute solo la primera vez, vemos un parametro del kwargs que nos indica esto.
+    if kwargs.get('created', False):
+        UserExtends.objects.get_or_create(usuario=instance)
+

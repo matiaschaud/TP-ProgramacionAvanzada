@@ -36,7 +36,7 @@ class test_if_logged(APIView):
 
 
 
-from rest_fwork.views import EmailsDetail, EmailsList, UserList, UserDetail
+from rest_fwork.views import EmailsDetail, EmailsList, UserList, UserDetail, QuotaInfo, EmailsListUser
 from rest_framework import renderers
 
 
@@ -58,7 +58,9 @@ urlpatterns = [
     path('api-token-auth/', obtain_jwt_token),
     path('test_if_logged',test_if_logged.as_view()),
     path('prueba',mail_processed_views.probando_emails),
+    path('quota_info/',QuotaInfo.as_view()),
     path('process_email/', EmailsList.as_view(), name='emails-list'),
+    path('history/<int:pk>/', EmailsListUser.as_view(), name='emails-list-user'),
     path('process_email/<int:pk>/', EmailsDetail.as_view(), name='emails-detail'),
     path('users/', UserList.as_view()),
     path('users/<int:pk>/', UserDetail.as_view()),

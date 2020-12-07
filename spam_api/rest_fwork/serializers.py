@@ -23,7 +23,7 @@ class EmailPredictedSerializer(serializers.Serializer):
     user = serializers.ReadOnlyField(source='user.username')
     # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     predicted = serializers.IntegerField(read_only=True)
-    # created = serializers.DateTimeField(read_only=True)
+    created = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
         """
@@ -44,9 +44,6 @@ class EmailPredictedSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-
-# TODO agregar quota_info para devolver info de peticiones.
-# TODO agregar /history/<N-EMAILS>/ como listado
 
 
 # TODO Todavia falta hacer el login por token - Por ahora esta con usuario y contraseña.
