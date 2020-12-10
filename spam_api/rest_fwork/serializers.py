@@ -30,7 +30,7 @@ class EmailPredictedSerializer(serializers.Serializer):
         Create and return a new `Emails` instance, given the validated data.
         """
         # TODO acá deberiamos asignar el resultado de la función de predicción.
-        validated_data['predicted'] = 1
+        validated_data['predicted'] = 0
         return Emails.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
