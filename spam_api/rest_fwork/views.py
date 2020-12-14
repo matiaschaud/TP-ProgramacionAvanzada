@@ -16,6 +16,7 @@ from rest_framework import status
 
 # Para los permisos
 from rest_framework import permissions
+from rest_framework import authentication
 from .permissions import IsOwnerOrReadOnly, IsDashboardUser
 
 
@@ -28,6 +29,7 @@ from .permissions import IsOwnerOrReadOnly, IsDashboardUser
 class EmailsListUser(APIView):
     # serializer_class = EmailPredictedSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (authentication.TokenAuthentication,)
 
     def get(self, request, pk, format=None):
 
@@ -49,10 +51,11 @@ class EmailsDashboard(APIView):
 
 class UsersDashboard(APIView):
     # permission_classes = (IsDashboardUser,)
+    authentication_classes = (authentication.TokenAuthentication,)
 
     def get(self, request, format=None):
-        # if request.user.username != 'DashboardUser':
-        #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if request.user.username != 'DashboardUser':
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -65,6 +68,7 @@ class EmailsList(
     queryset = Emails.objects.all()
     serializer_class = EmailPredictedSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (authentication.TokenAuthentication,)
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -101,6 +105,7 @@ class EmailsDetail(APIView):
     Retrieve, update or delete a emails instance.
     """
     permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (authentication.TokenAuthentication,)
 
     def get_object(self, pk):
         try:
@@ -133,7 +138,8 @@ class EmailsDetail(APIView):
 
 class QuotaInfo(generics.GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-    
+    authentication_classes = (authentication.TokenAuthentication,)
+
     def get(self, request, format=None):
         # El usuario está logeado?
         # if request.user == 'AnonymousUser':
@@ -150,3 +156,41 @@ def quota_info(request):
     emails = len(Emails.objects.filter(user=request.user))
     cuota = UserExtends.objects.filter(usuario=request.user)[0].cuota
     return {'disponible': cuota-emails,'cuota':cuota,'procesados':emails}
+
+from rest_framework import generics
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.generic.edit import FormView
+from django.contrib.auth import login,logout,authenticate
+from django.http import HttpResponseRedirect
+from django.contrib.auth.forms import AuthenticationForm
+from rest_framework.authtoken.models import Token
+
+
+class Login(FormView):
+    template_name = "login.html"
+    form_class = AuthenticationForm
+    success_url = reverse_lazy('emails-list')
+
+    @method_decorator(csrf_protect)
+    @method_decorator(never_cache)
+    def dispatch(self,request,*args,**kwargs):
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return super(Login,self).dispatch(request,*args,*kwargs)
+
+    def form_valid(self,form):
+        user = authenticate(username = form.cleaned_data['username'], password = form.cleaned_data['password'])
+        token,_ = Token.objects.get_or_create(user = user)
+        if token:
+            login(self.request, form.get_user())
+            return super(Login,self).form_valid(form)
+
+class Logout(APIView):
+    def get(self,request, format = None):
+        request.user.auth_token.delete()
+        logout(request)
+        return Response(status = status.HTTP_200_OK)

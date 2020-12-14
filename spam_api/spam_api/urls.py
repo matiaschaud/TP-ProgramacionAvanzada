@@ -24,6 +24,7 @@ from django.conf.urls import url
 
 from rest_framework import routers
 from rest_fwork import views as fwork_views
+from rest_framework.authtoken import views as views_authtoken
 
 
 
@@ -36,7 +37,7 @@ class test_if_logged(APIView):
 
 
 
-from rest_fwork.views import EmailsDetail, EmailsList, QuotaInfo, EmailsListUser, EmailsDashboard, UsersDashboard
+from rest_fwork.views import EmailsDetail, EmailsList, QuotaInfo, EmailsListUser, EmailsDashboard, UsersDashboard, Login, Logout
 from rest_framework import renderers
 
 
@@ -52,17 +53,25 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # admin
     path('admin/', admin.site.urls),
-    path('api-token-auth/', obtain_jwt_token),
-    path('test_if_logged',test_if_logged.as_view()),
-    path('prueba',mail_processed_views.probando_emails),
+
+    # pag ppal
+    path('', include(router.urls)),
+    
+    # servicios
     path('quota_info/',QuotaInfo.as_view()),
     path('process_email/', EmailsList.as_view(), name='emails-list'),
+    path('process_email/<int:pk>/', EmailsDetail.as_view(), name='emails-detail'),
+    path('history/<int:pk>/', EmailsListUser.as_view(), name='emails-list-user'),
+
+    # Dashboard
     path('emails_dashboard/',EmailsDashboard.as_view()),
     path('users_dashboard/',UsersDashboard.as_view()),
-    path('history/<int:pk>/', EmailsListUser.as_view(), name='emails-list-user'),
-    path('process_email/<int:pk>/', EmailsDetail.as_view(), name='emails-detail'),
+
+    # token
+    path('api-token-auth/', views_authtoken.obtain_auth_token),
+    path('login/', Login.as_view(), name = 'login'),
+    path('logout/', Logout.as_view()),
 ]
 
