@@ -51,8 +51,8 @@ class UsersDashboard(APIView):
     # permission_classes = (IsDashboardUser,)
 
     def get(self, request, format=None):
-        if request.user.username != 'DashboardUser':
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        # if request.user.username != 'DashboardUser':
+        #     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)

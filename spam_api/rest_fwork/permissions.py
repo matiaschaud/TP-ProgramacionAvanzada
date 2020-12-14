@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from rest_framework import status
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -22,9 +23,8 @@ class IsDashboardUser(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
-        print('estoy aca!!')
+        
+        code = status.HTTP_401_UNAUTHORIZED
         if request.user.username == 'DashboardUser':
             return True
 

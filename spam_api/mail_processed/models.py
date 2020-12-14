@@ -6,8 +6,8 @@ from django.db.models.signals import post_save
 # Create your models here.
 
 class Emails(models.Model):
-    subject   = models.CharField(verbose_name="Asunto", max_length=200)
-    content   = models.CharField(verbose_name="Contenido",max_length=1500)
+    # subject   = models.CharField(verbose_name="Asunto", max_length=200)
+    text   = models.CharField(verbose_name="Contenido",max_length=1500)
     user      = models.ForeignKey('auth.User', related_name='emails', on_delete=models.CASCADE)
     created   = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de petición")
     predicted = models.IntegerField(verbose_name="Predicción spam/ham",null=True)
@@ -17,7 +17,7 @@ class Emails(models.Model):
         verbose_name_plural = "emails"
 
     def __str__(self):
-        return self.subject
+        return self.user.username + ' - ' + self.text
 
 
 class UserExtends(models.Model):

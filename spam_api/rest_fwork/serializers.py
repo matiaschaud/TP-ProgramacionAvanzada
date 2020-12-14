@@ -18,8 +18,8 @@ from rest_framework import serializers
 
 
 class EmailPredictedSerializer(serializers.Serializer):
-    subject = serializers.CharField(max_length=200)
-    content = serializers.CharField(max_length=1500)
+    # subject = serializers.CharField(max_length=200)
+    text = serializers.CharField(max_length=1500)
     user = serializers.ReadOnlyField(source='user.username')
     # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     predicted = serializers.IntegerField(read_only=True)
@@ -37,8 +37,8 @@ class EmailPredictedSerializer(serializers.Serializer):
         """
         Update and return an existing `Emails` instance, given the validated data.
         """
-        instance.subject = validated_data.get('subject', instance.subject)
-        instance.content = validated_data.get('content', instance.content)
+        # instance.subject = validated_data.get('subject', instance.subject)
+        instance.text = validated_data.get('text', instance.content)
         instance.user = validated_data.get('user', instance.user)
         instance.predicted = validated_data.get('predicted', instance.predicted)
         instance.save()
@@ -46,7 +46,7 @@ class EmailPredictedSerializer(serializers.Serializer):
 
 
 
-# TODO Todavia falta hacer el login por token - Por ahora esta con usuario y contraseña.
+
 # ANALIZAR ESTE CÓDIGO A VER SI SIRVE PARA EL TEMA DEL TOKEN
 """ from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
