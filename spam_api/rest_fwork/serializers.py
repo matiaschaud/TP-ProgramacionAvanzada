@@ -3,6 +3,40 @@ from rest_framework import serializers
 from mail_processed.models import Emails
 
 
+# Predicción del modelo
+import numpy as np
+import pandas as pd
+import time 
+
+from sklearn.model_selection import train_test_split, cross_val_score, cross_validate, GridSearchCV, RandomizedSearchCV, validation_curve
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, f1_score, precision_score, auc, roc_curve, auc,plot_roc_curve
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+
+import numpy as np
+import pandas as pd
+import time 
+
+from sklearn.model_selection import train_test_split, cross_val_score, cross_validate, GridSearchCV, RandomizedSearchCV, validation_curve
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, f1_score, precision_score, auc, roc_curve, auc,plot_roc_curve
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+
+import pickle
+
+# MATRIZ DISPERSA
+modelo_tfidf_2=pickle.load(open('predict_model\modelo_tfidf_2.sav', 'rb'))
+model_GB_2 = pickle.load(open('predict_model\model_GB_2.sav', 'rb'))
+
+
+
+
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -30,7 +64,16 @@ class EmailPredictedSerializer(serializers.Serializer):
         Create and return a new `Emails` instance, given the validated data.
         """
         # TODO acá deberiamos asignar el resultado de la función de predicción.
-        validated_data['predicted'] = 0
+       
+        # Aplica transform
+        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform(validated_data['text']).toarray())
+        
+        #XGBOOST
+        y_pred_proba_testing_2 = model_GB_2.predict_proba(X_testing_2)
+        y_pred_testing_2=[1 if m > 0.367 else 0 for m in y_pred_proba_testing_2[:,1]]
+        
+        validated_data['predicted'] = y_pred_testing_2[0]
+
         return Emails.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
