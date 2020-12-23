@@ -64,9 +64,10 @@ class EmailPredictedSerializer(serializers.Serializer):
         Create and return a new `Emails` instance, given the validated data.
         """
         # TODO acá deberiamos asignar el resultado de la función de predicción.
-       
+
+        # print('estoy aca')
         # Aplica transform
-        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform(validated_data['text']).toarray())
+        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform([validated_data['text']]).toarray())
         
         #XGBOOST
         y_pred_proba_testing_2 = model_GB_2.predict_proba(X_testing_2)

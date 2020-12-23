@@ -94,7 +94,7 @@ class EmailsList(
             except:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response("{'status':fail, 'message':'No quota left'}")
+            return Response('{"status":fail, "message":"No quota left"}')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -148,7 +148,8 @@ class QuotaInfo(generics.GenericAPIView):
         
         try:
             quota_info_data = quota_info(request)
-            return Response("{" + f"'procesados':{quota_info_data   ['procesados']}, 'disponible ':{quota_info_data    ['disponible']}" + "}")
+            return Response({'procesados':quota_info_data['procesados'], 'disponible':quota_info_data['disponible']})
+            # return Response("{" + f"'procesados':{quota_info_data['procesados']}, 'disponible':{quota_info_data['disponible']}" + "}")
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
