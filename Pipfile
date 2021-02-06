@@ -9,6 +9,9 @@ markdown = "*"
 django-filter = "*"
 django = "*"
 djangorestframework-jwt = "*"
+numpy = "*"
+pandas = "*"
+sklearn = "*"
 
 [dev-packages]
 

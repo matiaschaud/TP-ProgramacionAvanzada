@@ -28,8 +28,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 import pickle
 
 # MATRIZ DISPERSA
-modelo_tfidf_2=pickle.load(open('predict_model\modelo_tfidf_2.sav', 'rb'))
-model_GB_2 = pickle.load(open('predict_model\model_GB_2.sav', 'rb'))
+#modelo_tfidf_2=pickle.load(open('predict_model/modelo_tfidf_2.sav', 'rb'))
+#model_GB_2 = pickle.load(open('predict_model/model_GB_2.sav', 'rb'))
 
 
 
@@ -67,13 +67,14 @@ class EmailPredictedSerializer(serializers.Serializer):
 
         # print('estoy aca')
         # Aplica transform
-        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform([validated_data['text']]).toarray())
+#        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform([validated_data['text']]).toarray())
         
         #XGBOOST
-        y_pred_proba_testing_2 = model_GB_2.predict_proba(X_testing_2)
-        y_pred_testing_2=[1 if m > 0.367 else 0 for m in y_pred_proba_testing_2[:,1]]
+#       y_pred_proba_testing_2 = model_GB_2.predict_proba(X_testing_2)
+#        y_pred_testing_2=[1 if m > 0.367 else 0 for m in y_pred_proba_testing_2[:,1]]
         
-        validated_data['predicted'] = y_pred_testing_2[0]
+#        validated_data['predicted'] = y_pred_testing_2[0]
+        validated_data['predicted'] = np.random.choice([0,1],1)[0]
 
         return Emails.objects.create(**validated_data)
 
