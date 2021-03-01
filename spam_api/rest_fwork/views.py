@@ -41,8 +41,8 @@ class EmailsDashboard(APIView):
     # permission_classes = (IsDashboardUser,)
 
     def get(self, request, format=None):
-        if request.user.username != 'DashboardUser':
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+#        if request.user.username != 'DashboardUser':
+#            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         emails = Emails.objects.all()
         serializer = EmailPredictedSerializer(emails, many=True)
@@ -94,7 +94,7 @@ class EmailsList(
             except:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response('{"status":fail, "message":"No quota left"}')
+            return Response({"status":"fail", "message":"No quota left"})
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

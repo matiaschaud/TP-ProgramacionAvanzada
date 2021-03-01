@@ -1,3 +1,4 @@
+
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from mail_processed.models import Emails
@@ -27,12 +28,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import pickle
 
-# MATRIZ DISPERSA
-#modelo_tfidf_2=pickle.load(open('predict_model/modelo_tfidf_2.sav', 'rb'))
-#model_GB_2 = pickle.load(open('predict_model/model_GB_2.sav', 'rb'))
 
-
-
+modelo_tfidf_2 = pickle.load(open('/home/ubuntu/TP-ProgramacionAvanzada/spam_api/predict_model/modelo_tfidf_2.sav', 'rb'))
+model_GB_2 = pickle.load(open('/home/ubuntu/TP-ProgramacionAvanzada/spam_api/predict_model/model_GB_2.sav', 'rb'))
 
 
 
@@ -40,7 +38,7 @@ import pickle
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'groups','emails']
+        fields = ['id', 'username', 'email', 'groups','emails','date_joined']
 
 # class EmailPredictedSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -60,21 +58,15 @@ class EmailPredictedSerializer(serializers.Serializer):
     created = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
-        """
-        Create and return a new `Emails` instance, given the validated data.
-        """
-        # TODO acá deberiamos asignar el resultado de la función de predicción.
+        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform([validated_data['text']]).toarray())
 
-        # print('estoy aca')
-        # Aplica transform
-#        X_testing_2= pd.DataFrame(modelo_tfidf_2.transform([validated_data['text']]).toarray())
-        
-        #XGBOOST
-#       y_pred_proba_testing_2 = model_GB_2.predict_proba(X_testing_2)
-#        y_pred_testing_2=[1 if m > 0.367 else 0 for m in y_pred_proba_testing_2[:,1]]
-        
-#        validated_data['predicted'] = y_pred_testing_2[0]
-        validated_data['predicted'] = np.random.choice([0,1],1)[0]
+
+
+        y_pred_proba_testing_2 = model_GB_2.predict_proba(X_testing_2)
+        y_pred_testing_2=[1 if m > 0.367 else 0 for m in y_pred_proba_testing_2[:,1]]
+
+        validated_data['predicted'] = y_pred_testing_2[0]
+#        validated_data['predicted'] = np.random.choice([0,1],1)[0]
 
         return Emails.objects.create(**validated_data)
 
